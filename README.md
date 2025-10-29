@@ -82,3 +82,8 @@ npm install
 # 6. Start the frontend development server
 npm run dev
 # App will open on http://localhost:5173 (or similar)
+
+
+# 7. Here is the demo video of the featured implemented in the project.
+
+https://www.loom.com/share/9bee3adc00054087b0aa1bdcf47c2a27
