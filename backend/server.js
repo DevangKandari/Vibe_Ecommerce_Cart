@@ -13,9 +13,8 @@ app.use(cors());
 
 app.use(express.json());
 
-app.use(express.json());
-
 app.use("/api/products", require("./routes/productRoutes"));
+app.use("/api/cart", require("./routes/cartRoutes"));
 
 app.get("/", (req, res) => {
   res.send("Vibe Commerce API Running...");
