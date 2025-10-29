@@ -8,13 +8,18 @@ This is a full-stack e-commerce shopping cart application built for the Vibe Com
 
 **Main Products Page:**
 
+<img width="1901" height="911" alt="image" src="https://github.com/user-attachments/assets/3ac2356b-5c43-47bd-a1eb-3980cce8b008" />
 
 
 **Cart & Checkout:**
-_(Drag your screenshot of the cart with items in it here)_
+
+<img width="1899" height="911" alt="image" src="https://github.com/user-attachments/assets/0b1a6731-ef6f-4a31-829f-59fad933c4cc" />
+
 
 **Checkout Receipt:**
-_(Drag your screenshot of the successful receipt modal here)_
+
+<img width="1901" height="910" alt="image" src="https://github.com/user-attachments/assets/efd73a5d-26d3-43e9-8a80-21030f3de37f" />
+
 
 ---
 
@@ -53,6 +58,27 @@ To run this project locally, follow these steps:
 
 ```bash
 # 1. Clone the repository
-git clone [https://github.com/your-username/vibe-commerce-assignment.git](https://github.com/your-username/vibe-commerce-assignment.git)
+git clone https://github.com/DevangKandari/Vibe_Ecommerce_Cart.git
 cd vibe-commerce-assignment
 ```
+
+# 2. Go to the backend folder and install dependencies
+cd backend
+npm install
+
+# 3. Create a .env file in the /backend folder
+#    and add your MongoDB string and a port:
+PORT=5001
+MONGO_URI=YOUR_MONGODB_ATLAS_CONNECTION_STRING_HERE
+
+# 4. Start the backend server
+npm start
+# Server will be running on http://localhost:5001
+
+# 5. Open a new terminal and go to the frontend folder
+cd frontend
+npm install
+
+# 6. Start the frontend development server
+npm run dev
+# App will open on http://localhost:5173 (or similar)
