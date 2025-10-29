@@ -7,31 +7,33 @@ const getProducts = async (req, res) => {
     if (products.length === 0) {
       const mockProducts = [
         {
-          name: "Classic T-Shirt",
+          name: "T-Shirt",
           price: 25.99,
           imageUrl:
-            "https://via.placeholder.com/150/0000FF/808080?Text=T-Shirt",
+            "https://images.pexels.com/photos/8532616/pexels-photo-8532616.jpeg",
         },
         {
-          name: "Leather Wallet",
+          name: "Wallet",
           price: 49.5,
-          imageUrl: "https://via.placeholder.com/150/FF0000/FFFFFF?Text=Wallet",
+          imageUrl:
+            "https://images.pexels.com/photos/915915/pexels-photo-915915.jpeg",
         },
         {
           name: "Bluetooth Headphones",
           price: 199.99,
           imageUrl:
-            "https://via.placeholder.com/150/008000/FFFFFF?Text=Headphones",
+            "https://images.pexels.com/photos/3394666/pexels-photo-3394666.jpeg",
         },
         {
-          name: "Coffee Mug",
+          name: "Jeans",
           price: 15.0,
-          imageUrl: "https://via.placeholder.com/150/FFFF00/000000?Text=Mug",
+          imageUrl:
+            "https://images.pexels.com/photos/1598507/pexels-photo-1598507.jpeg",
         },
         {
-          name: "Running Shoes",
+          name: "Shoes",
           price: 89.9,
-          imageUrl: "https://via.placeholder.com/150/800080/FFFFFF?Text=Shoes",
+          imageUrl: "https://images.pexels.com/photos/19090/pexels-photo.jpg",
         },
       ];
       products = await Product.insertMany(mockProducts);
@@ -44,6 +46,32 @@ const getProducts = async (req, res) => {
   }
 };
 
+const createProduct = async (req, res) => {
+  const { name, price, imageUrl } = req.body;
+
+  if (!name || !price) {
+    return res.status(400).json({ msg: "Please provide a name and price" });
+  }
+
+  try {
+    const newProduct = new Product({
+      name,
+      price: parseFloat(price),
+      // Use a placeholder if no image URL is provided
+      imageUrl:
+        imageUrl ||
+        "https://via.placeholder.com/150/CCCCCC/000000?Text=New+Product",
+    });
+
+    const product = await newProduct.save();
+    res.status(201).json(product);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send("Server Error");
+  }
+};
+
 module.exports = {
   getProducts,
+  createProduct,
 };

@@ -64,8 +64,49 @@ const removeFromCart = async (req, res) => {
       return res.status(404).json({ msg: "Cart item not found" });
     }
 
-    await cartItem.remove();
+    await cartItem.deleteOne();
 
+    const cartItems = await CartItem.find().populate("product");
+    const total = cartItems.reduce((acc, item) => {
+      return acc + item.product.price * item.quantity;
+    }, 0);
+
+    res.json({
+      cartItems,
+      total: parseFloat(total.toFixed(2)),
+    });
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send("Server Error");
+  }
+};
+
+const updateCartItemQuantity = async (req, res) => {
+  const { action } = req.body;
+
+  try {
+    const cartItem = await CartItem.findById(req.params.id).populate("product");
+
+    if (!cartItem) {
+      return res.status(404).json({ msg: "Cart item not found" });
+    }
+
+    if (action === "increment") {
+      cartItem.quantity += 1;
+      await cartItem.save();
+    } else if (action === "decrement") {
+      cartItem.quantity -= 1;
+
+      if (cartItem.quantity <= 0) {
+        await cartItem.deleteOne();
+      } else {
+        await cartItem.save();
+      }
+    } else {
+      return res.status(400).json({ msg: "Invalid action" });
+    }
+
+    // Always return the fresh, full cart
     const cartItems = await CartItem.find().populate("product");
     const total = cartItems.reduce((acc, item) => {
       return acc + item.product.price * item.quantity;
@@ -85,4 +126,5 @@ module.exports = {
   getCart,
   addToCart,
   removeFromCart,
+  updateCartItemQuantity,
 };
