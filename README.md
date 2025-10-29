@@ -61,3 +61,24 @@ To run this project locally, follow these steps:
 git clone https://github.com/DevangKandari/Vibe_Ecommerce_Cart.git
 cd vibe-commerce-assignment
 ```
+
+# 2. Go to the backend folder and install dependencies
+cd backend
+npm install
+
+# 3. Create a .env file in the /backend folder
+#    and add your MongoDB string and a port:
+PORT=5001
+MONGO_URI=YOUR_MONGODB_ATLAS_CONNECTION_STRING_HERE
+
+# 4. Start the backend server
+npm start
+# Server will be running on http://localhost:5001
+
+# 5. Open a new terminal and go to the frontend folder
+cd frontend
+npm install
+
+# 6. Start the frontend development server
+npm run dev
+# App will open on http://localhost:5173 (or similar)
