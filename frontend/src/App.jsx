@@ -1,8 +1,7 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
-
 import CheckoutModal from "./components/checkoutModal";
-import AddProductModal from "./components/AddProductModal";
+import ProductFormModal from "./components/ProductFormModal";
 
 import Header from "./components/Header";
 import Cart from "./components/Cart";
@@ -12,10 +11,13 @@ function App() {
   const [products, setProducts] = useState([]);
   const [cart, setCart] = useState({ cartItems: [], total: 0 });
   const [loading, setLoading] = useState(true);
+
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
+
   const [receipt, setReceipt] = useState(null);
-  const [isProductModalOpen, setIsProductModalOpen] = useState(false);
+  const [isFormModalOpen, setIsFormModalOpen] = useState(false);
+  const [productToEdit, setProductToEdit] = useState(null);
 
   useEffect(() => {
     const loadData = async () => {
@@ -35,6 +37,61 @@ function App() {
     };
     loadData();
   }, []);
+
+  const fetchCart = async () => {
+    try {
+      const { data } = await axios.get("/api/cart");
+      setCart(data);
+    } catch (error) {
+      console.error("Error fetching cart:", error);
+    }
+  };
+
+  const handleSaveProduct = async (productData) => {
+    try {
+      if (productToEdit) {
+        const { data: updatedProduct } = await axios.put(
+          `/api/products/${productToEdit._id}`,
+          productData
+        );
+
+        setProducts(
+          products.map((p) =>
+            p._id === updatedProduct._id ? updatedProduct : p
+          )
+        );
+      } else {
+        const { data: newProduct } = await axios.post(
+          "/api/products",
+          productData
+        );
+
+        setProducts([newProduct, ...products]);
+      }
+    } catch (error) {
+      console.error("Error saving product:", error);
+    }
+  };
+
+  const handleDeleteProduct = async (productId) => {
+    try {
+      await axios.delete(`/api/products/${productId}`);
+      setProducts(products.filter((p) => p._id !== productId));
+      fetchCart();
+    } catch (error) {
+      console.error("Error deleting product:", error);
+    }
+  };
+
+  const openAddNewModal = () => {
+    setProductToEdit(null);
+    setIsFormModalOpen(true);
+  };
+
+  const openEditModal = (product) => {
+    setProductToEdit(product);
+    setIsFormModalOpen(true);
+  };
 
   const handleAddToCart = async (productId) => {
     try {
@@ -68,10 +125,7 @@ function App() {
 
   const handleCheckout = async (e) => {
     e.preventDefault();
-    if (cart.cartItems.length === 0) {
-      alert("Your cart is empty!");
-      return;
-    }
+    if (cart.cartItems.length === 0) return;
     try {
       const { data } = await axios.post("/api/checkout", {
         customer: { name, email },
@@ -82,21 +136,19 @@ function App() {
       setEmail("");
     } catch (error) {
       console.error("Error during checkout:", error);
-      alert("Checkout failed. Please try again.");
     }
-  };
-
-  const handleProductAdded = (newProduct) => {
-    setProducts([newProduct, ...products]);
   };
 
   return (
     <>
       <CheckoutModal receipt={receipt} onClose={() => setReceipt(null)} />
-      <AddProductModal
-        isOpen={isProductModalOpen}
-        onClose={() => setIsProductModalOpen(false)}
-        onProductAdded={handleProductAdded}
+
+      {/* --- Updated Product Form Modal --- */}
+      <ProductFormModal
+        isOpen={isFormModalOpen}
+        onClose={() => setIsFormModalOpen(false)}
+        onSave={handleSaveProduct}
+        productToEdit={productToEdit}
       />
 
       <div className="bg-gray-100 min-h-screen">
@@ -108,14 +160,14 @@ function App() {
               <p className="lg:col-span-3 text-center">Loading...</p>
             ) : (
               <>
-                {/* Product Grid*/}
+                {/* --- Product Grid --- */}
                 <div className="lg:col-span-2">
                   <div className="flex justify-between items-center mb-6">
                     <h2 className="text-2xl font-semibold text-gray-700">
                       Products
                     </h2>
                     <button
-                      onClick={() => setIsProductModalOpen(true)}
+                      onClick={openAddNewModal}
                       className="bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition duration-300"
                     >
                       + Add New Product
@@ -134,6 +186,8 @@ function App() {
                           cartItem={cartItem}
                           onAddToCart={handleAddToCart}
                           onUpdateQuantity={handleUpdateQuantity}
+                          onEdit={() => openEditModal(product)}
+                          onDelete={() => handleDeleteProduct(product._id)}
                         />
                       );
                     })}

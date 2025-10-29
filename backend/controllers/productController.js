@@ -1,5 +1,6 @@
 const axios = require("axios");
 const Product = require("../models/productModel");
+const CartItem = require("../models/cartModel");
 
 const mockProducts = [
   {
@@ -100,8 +101,51 @@ const createProduct = async (req, res) => {
   }
 };
 
+const updateProduct = async (req, res) => {
+  const { name, price, imageUrl } = req.body;
+
+  try {
+    let product = await Product.findById(req.params.id);
+
+    if (!product) {
+      return res.status(404).json({ msg: "Product not found" });
+    }
+
+    product.name = name || product.name;
+    product.price = price || product.price;
+    product.imageUrl = imageUrl || product.imageUrl;
+
+    const updatedProduct = await product.save();
+    res.json(updatedProduct);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send("Server Error");
+  }
+};
+
+const deleteProduct = async (req, res) => {
+  try {
+    const product = await Product.findById(req.params.id);
+
+    if (!product) {
+      return res.status(404).json({ msg: "Product not found" });
+    }
+
+    await product.deleteOne();
+
+    await CartItem.deleteMany({ product: req.params.id });
+
+    res.json({ msg: "Product and associated cart items removed" });
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send("Server Error");
+  }
+};
+
 module.exports = {
+  seedDatabase,
   getProducts,
   createProduct,
-  seedDatabase,
+  updateProduct,
+  deleteProduct,
 };

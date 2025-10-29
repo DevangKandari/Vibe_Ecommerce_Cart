@@ -1,13 +1,24 @@
-import React, { useState } from "react";
-import axios from "axios";
+import React, { useState, useEffect } from "react";
 
-function AddProductModal({ isOpen, onClose, onProductAdded }) {
+function ProductFormModal({ isOpen, onClose, onSave, productToEdit }) {
+  const isEditMode = Boolean(productToEdit);
+
   const [name, setName] = useState("");
   const [price, setPrice] = useState("");
   const [imageUrl, setImageUrl] = useState("");
   const [error, setError] = useState("");
 
-  if (!isOpen) return null;
+  useEffect(() => {
+    if (isEditMode) {
+      setName(productToEdit.name);
+      setPrice(productToEdit.price);
+      setImageUrl(productToEdit.imageUrl);
+    } else {
+      setName("");
+      setPrice("");
+      setImageUrl("");
+    }
+  }, [productToEdit, isEditMode, isOpen]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -16,40 +27,37 @@ function AddProductModal({ isOpen, onClose, onProductAdded }) {
       return;
     }
 
-    try {
-      const { data } = await axios.post("/api/products", {
-        name,
-        price: parseFloat(price),
-        imageUrl,
-      });
-      onProductAdded(data);
-      handleClose();
-    } catch (err) {
-      console.error("Error creating product:", err);
-      setError("Failed to create product. Please try again.");
-    }
+    const productData = {
+      name,
+      price: parseFloat(price),
+      imageUrl,
+    };
+
+    onSave(productData);
+    handleClose();
   };
 
   const handleClose = () => {
-    setName("");
-    setPrice("");
-    setImageUrl("");
     setError("");
     onClose();
   };
+
+  if (!isOpen) return null;
 
   return (
     <div
       className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50"
       onClick={handleClose}
     >
-      {/* Modal Content */}
       <div
         className="bg-white rounded-lg shadow-xl p-8 w-full max-w-md mx-4"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-bold text-gray-800">Add New Product</h2>
+          {/* Dynamic Title */}
+          <h2 className="text-2xl font-bold text-gray-800">
+            {isEditMode ? "Edit Product" : "Add New Product"}
+          </h2>
           <button
             onClick={handleClose}
             className="text-gray-500 hover:text-gray-700 text-2xl"
@@ -99,7 +107,7 @@ function AddProductModal({ isOpen, onClose, onProductAdded }) {
               htmlFor="imageUrl"
               className="block text-sm font-medium text-gray-700"
             >
-              Image URL (Optional)
+              Image URL
             </label>
             <input
               type="text"
@@ -122,7 +130,8 @@ function AddProductModal({ isOpen, onClose, onProductAdded }) {
               type="submit"
               className="bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition duration-300"
             >
-              Add Product
+              {/* Dynamic Button Text */}
+              {isEditMode ? "Update Product" : "Add Product"}
             </button>
           </div>
         </form>
@@ -131,4 +140,4 @@ function AddProductModal({ isOpen, onClose, onProductAdded }) {
   );
 }
 
-export default AddProductModal;
+export default ProductFormModal;
