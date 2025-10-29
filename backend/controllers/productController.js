@@ -57,10 +57,9 @@ const createProduct = async (req, res) => {
     const newProduct = new Product({
       name,
       price: parseFloat(price),
-      // Use a placeholder if no image URL is provided
       imageUrl:
         imageUrl ||
-        "https://via.placeholder.com/150/CCCCCC/000000?Text=New+Product",
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTcxOacweDULECGAMT9YxpNpVHQ3g6rqxDA_A&s",
     });
 
     const product = await newProduct.save();
